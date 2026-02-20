@@ -1,0 +1,24 @@
+# Data Science & Machine Learning
+pandas
+numpy
+scikit-learn
+statsmodels
+prophet
+xgboost
+
+# ML APIs
+fastapi
+uvicorn
+
+# Dashboard
+streamlit
+
+# Plotting & Visualization
+matplotlib
+seaborn
+
+# Development & Notebooks
+jupyter
+notebook
+pytest
+python-dotenv
