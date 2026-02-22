@@ -57,3 +57,12 @@ A scalable system designed to predict product demand using time-series and machi
    ```bash
    pip install -r requirements.txt
    ```
+
+## 👥 Contributors
+
+* **Mark Mohsen Nasry**
+* **Fady Milad Shahat**
+* **Ahmed Arafa Hafez**
+* **Eman Ahmed Sayed**
+* **Sama Ashraf Mahmoud**
+* **Hadeer Mahmoud Abdelsalam**
