@@ -1,0 +1,22 @@
+[
+  "lag_1",
+  "lag_2",
+  "lag_4",
+  "rolling_mean_4",
+  "rolling_std_4",
+  "rolling_mean_4_raw",
+  "Avg_UnitPrice",
+  "log_price",
+  "price_change_pct",
+  "Total_Promo",
+  "has_promo",
+  "Week",
+  "Month",
+  "week_sin",
+  "week_cos",
+  "Factor",
+  "UOM_encoded",
+  "item_encoded",
+  "brand_encoded",
+  "brand_avg_week_qty"
+]
