@@ -18,8 +18,6 @@
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-1.4-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
 
-**Live API:** [`https://stocksense-backend-eui.azurewebsites.net`](https://stocksense-backend-eui.azurewebsites.net/health)
-
 </div>
 
 ---
