@@ -101,3 +101,50 @@ data/raw/*
 # src/models/*.joblib
 # src/models/*.h5
 # src/models/*.pkl
+
+# ----------------------------------------------------------------------
+# Flutter / Mobile App (stocksense/)
+# ----------------------------------------------------------------------
+
+# Flutter build output and Dart tool cache
+stocksense/build/
+stocksense/.dart_tool/
+stocksense/.pub-cache/
+stocksense/.pub/
+stocksense/coverage/
+
+# Flutter-generated files (regenerated on `flutter pub get`)
+stocksense/.flutter-plugins
+stocksense/.flutter-plugins-dependencies
+
+# Android Gradle build artifacts
+stocksense/android/.gradle/
+stocksense/android/local.properties
+stocksense/android/app/debug/
+stocksense/android/app/profile/
+stocksense/android/app/release/
+stocksense/android/.kotlin/
+
+# iOS CocoaPods and symlinks (not needed for Android-focused builds)
+stocksense/ios/Pods/
+stocksense/ios/.symlinks/
+stocksense/ios/Flutter/Flutter.framework
+stocksense/ios/Flutter/Flutter.podspec
+stocksense/ios/Flutter/Generated.xcconfig
+stocksense/ios/Flutter/flutter_export_environment.sh
+
+# macOS ephemeral Flutter files
+stocksense/macos/Flutter/ephemeral/
+
+# IDE project files
+stocksense/.idea/
+stocksense/*.iml
+
+# Java/Gradle crash logs that appear during development
+stocksense/hs_err_pid*.log
+stocksense/replay_pid*.log
+
+# ----------------------------------------------------------------------
+# Legacy Folder (no longer needed — all code promoted to root)
+# ----------------------------------------------------------------------
+Demand Forecasting Inventory Optimization Refined/

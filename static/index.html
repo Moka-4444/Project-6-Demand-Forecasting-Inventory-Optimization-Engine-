@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartInventory Mobile App Simulation</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js for beautiful charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-dark: #090a0f;
+            --card-bg: #121420;
+            --accent-purple: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-pink: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --critical: #ef4444;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --gradient: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            --glow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #050508;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Phone Container */
+        .phone-frame {
+            width: 410px;
+            height: 840px;
+            background-color: var(--bg-dark);
+            border: 12px solid #27273a;
+            border-radius: 48px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(139, 92, 246, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Notch / Dynamic Island simulation */
+        .dynamic-island {
+            width: 110px;
+            height: 30px;
+            background-color: #000;
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+            box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.1);
+        }
+
+        .dynamic-island-camera {
+            width: 10px;
+            height: 10px;
+            background-color: #1a1a1a;
+            border-radius: 50%;
+        }
+
+        /* Screen Wrapper */
+        .screen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-top: 48px; /* Safe area for notch */
+            position: relative;
+            height: 100%;
+        }
+
+        /* Header block */
+        .app-header {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .app-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        /* Content Area */
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            padding-bottom: 80px; /* Safe space for tab bar */
+        }
+
+        /* Hide Scrollbars */
+        .app-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Tab Panels */
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glassmorphic Cards */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            border-color: rgba(139, 92, 246, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Banner */
+        .hero-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.05));
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .hero-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Grid metrics */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .metric-item {
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 20px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .metric-val {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 8px;
+            background: linear-gradient(135deg, #fff, #a1a1aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .metric-lbl {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Search Input */
+        .search-box {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            background-color: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 12px 16px 12px 42px;
+            color: #fff;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* Brand Filters */
+        .filters-container {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+            padding-bottom: 4px;
+        }
+
+        .filters-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-btn {
+            background-color: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: var(--gradient);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: var(--glow);
+        }
+
+        /* Product List */
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .product-item:hover {
+            transform: translateX(4px);
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-info h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+            max-width: 260px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .product-info p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .product-meta {
+            text-align: right;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .tag-purple {
+            background-color: rgba(139, 92, 246, 0.15);
+            color: #c084fc;
+        }
+
+        .tag-success {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+        }
+
+        .tag-warning {
+            background-color: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+        }
+
+        .tag-critical {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+        }
+
+        /* Bottom Tab Navigation */
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 72px;
+            background-color: rgba(18, 20, 32, 0.9);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+            padding-bottom: 8px;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.7rem;
+            font-weight: 500;
+            gap: 4px;
+        }
+
+        .tab-item.active {
+            color: var(--accent-purple);
+        }
+
+        .tab-item i {
+            font-size: 1.2rem;
+        }
+
+        /* Detail Modal / Slide up Drawer */
+        .drawer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 85%;
+            background-color: var(--bg-dark);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px 32px 0 0;
+            z-index: 1000;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.1, 0.76, 0.55, 0.94);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .drawer.open {
+            transform: translateY(0);
+        }
+
+        .drawer-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .drawer-handle {
+            width: 40px;
+            height: 5px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .drawer-body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Retrain Button & Loader */
+        .btn-retrain {
+            width: 100%;
+            background: var(--gradient);
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--glow);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-retrain:hover {
+            opacity: 0.9;
+        }
+
+        .btn-retrain:disabled {
+            background: #27273a;
+            color: var(--text-muted);
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* Overlay loader */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(9, 10, 15, 0.95);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(139, 92, 246, 0.1);
+            border-top: 4px solid var(--accent-purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 24px;
+            box-shadow: var(--glow);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .overlay h3 {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+        }
+
+        .overlay p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        /* Drift statuses */
+        .drift-status-block {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            margin-bottom: 12px;
+        }
+
+        .drift-status-block:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Grid values for inventory parameters */
+        .param-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .param-card {
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .param-val {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .param-lbl {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* Responsive on mobile */
+        @media (max-width: 450px) {
+            body {
+                background-color: var(--bg-dark);
+            }
+            .phone-frame {
+                width: 100vw;
+                height: 100vh;
+                border: none;
+                border-radius: 0;
+            }
+            .dynamic-island {
+                display: none;
+            }
+            .screen {
+                padding-top: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Simulator Frame -->
+    <div class="phone-frame">
+        <!-- Dynamic Island simulation -->
+        <div class="dynamic-island">
+            <div class="dynamic-island-camera"></div>
+            <div style="font-size: 0.75rem; color: #fff; font-weight: 600;">9:41</div>
+            <div style="display: flex; gap: 4px; align-items: center; color: #fff;">
+                <i data-lucide="wifi" style="width: 12px; height: 12px;"></i>
+                <i data-lucide="battery" style="width: 12px; height: 12px;"></i>
+            </div>
+        </div>
+
+        <div class="screen">
+            <!-- Header -->
+            <div class="app-header">
+                <div>
+                    <h1 id="header-title">SmartInventory</h1>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center;">
+                        <span class="status-dot"></span> System Operational
+                    </p>
+                </div>
+                <div id="btn-refresh" style="cursor: pointer; color: var(--text-muted);">
+                    <i data-lucide="refresh-cw" style="width: 20px; height: 20px;"></i>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="app-content">
+
+                <!-- 1. HOME TAB PANEL -->
+                <div id="panel-home" class="tab-panel active">
+                    <div class="card hero-card">
+                        <div class="hero-title">Demand Engine</div>
+                        <div class="hero-desc">Powered by XGBoost, Random Forest & Ridge Regression Weighted Ensemble forecasting.</div>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <span class="metric-lbl">Total Items</span>
+                            <span class="metric-val" id="val-total-products">136</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-lbl">Active Alerts</span>
+                            <span class="metric-val" id="val-active-alerts" style="color: var(--warning);">0</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="font-size: 1rem; margin-bottom: 12px;">ML Model Info</h3>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px;">
+                            <span class="text-muted">Ensemble Weights</span>
+                            <span style="font-weight: 500;">XGB: 50% │ RF: 50%</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px;">
+                            <span class="text-muted">Features Used</span>
+                            <span style="font-weight: 500;">21 Engineered Columns</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                            <span class="text-muted">Reference Period</span>
+                            <span style="font-weight: 500;">Weeks <= 18</span>
+                        </div>
+                    </div>
+
+                    <div class="card" style="border-color: rgba(59, 130, 246, 0.25);">
+                        <h3 style="font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="activity" style="color: var(--accent-blue); width: 18px; height: 18px;"></i>
+                            Data Drift Status
+                        </h3>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px;">
+                            <span class="text-muted">Drift Metric (PSI)</span>
+                            <span id="drift-summary-text" style="color: var(--success); font-weight: 600;">Checking...</span>
+                        </div>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">
+                            Data stability is checked across main Sales indicators using the Population Stability Index.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 2. PRODUCTS TAB PANEL -->
+                <div id="panel-products" class="tab-panel">
+                    <div class="search-box">
+                        <i data-lucide="search" class="search-icon" style="width: 18px; height: 18px;"></i>
+                        <input type="text" id="product-search" class="search-input" placeholder="Search product name or ID...">
+                    </div>
+
+                    <!-- Horizontal Brand filter -->
+                    <div class="filters-container" id="brand-filters">
+                        <span class="filter-btn active" data-brand="all">All Brands</span>
+                    </div>
+
+                    <div class="card" style="padding: 12px 16px;">
+                        <div id="product-list" style="max-height: 520px;">
+                            <div style="text-align: center; padding: 20px; color: var(--text-muted);">
+                                Loading products...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. ALERTS TAB PANEL -->
+                <div id="panel-alerts" class="tab-panel">
+                    <div class="card hero-card" style="background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.25);">
+                        <div class="hero-title" style="color: #f87171; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="alert-triangle"></i> Reorder Alerts
+                        </div>
+                        <div class="hero-desc">Products where weekly forecast demand falls below calculated Safety Stock or Reorder Point (ROP).</div>
+                    </div>
+
+                    <div class="card" style="padding: 12px 16px;">
+                        <div id="alerts-list">
+                            <div style="text-align: center; padding: 20px; color: var(--text-muted);">
+                                No alerts currently active.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. MLOPS TAB PANEL -->
+                <div id="panel-mlops" class="tab-panel">
+                    <div class="card">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="database" style="color: var(--accent-purple);"></i>
+                            Drift Assessment
+                        </h3>
+                        <div id="drift-details-container">
+                            <div style="text-align: center; padding: 20px; color: var(--text-muted);">
+                                Checking drift status...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 12px;">Trigger Training Pipeline</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4;">
+                            Initiate XGBoost & RF training across all products using the latest transaction data in weekly.csv. Evaluates WMAPE and computes new weights.
+                        </p>
+                        <button class="btn-retrain" id="btn-trigger-retrain">
+                            <i data-lucide="play" style="width: 18px; height: 18px;"></i>
+                            Start Pipeline
+                        </button>
+                    </div>
+
+                    <div class="card" id="retrain-metrics-card" style="display: none;">
+                        <h3 style="font-size: 1rem; margin-bottom: 12px; color: var(--success);">Retraining Completed Successfully</h3>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.85rem;">
+                            <div class="drift-status-block" style="flex-direction: column; align-items: flex-start;">
+                                <span class="text-muted" style="font-size: 0.7rem;">VAL MAE</span>
+                                <strong id="metric-mae">-</strong>
+                            </div>
+                            <div class="drift-status-block" style="flex-direction: column; align-items: flex-start;">
+                                <span class="text-muted" style="font-size: 0.7rem;">VAL WMAPE</span>
+                                <strong id="metric-wmape">-</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Tab Navigation Bar -->
+            <div class="tab-bar">
+                <div class="tab-item active" data-target="home">
+                    <i data-lucide="home"></i>
+                    <span>Home</span>
+                </div>
+                <div class="tab-item" data-target="products">
+                    <i data-lucide="box"></i>
+                    <span>Products</span>
+                </div>
+                <div class="tab-item" data-target="alerts">
+                    <i data-lucide="bell"></i>
+                    <span>Alerts</span>
+                </div>
+                <div class="tab-item" data-target="mlops">
+                    <i data-lucide="cpu"></i>
+                    <span>MLOps</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Detail Drawer -->
+        <div class="drawer" id="product-drawer">
+            <div class="drawer-handle"></div>
+            <div class="drawer-header">
+                <div>
+                    <h3 id="drawer-item-name" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 4px;">Product Name</h3>
+                    <p id="drawer-item-id" style="font-size: 0.75rem; color: var(--text-muted);">ItemID: BCH-3-08-00272</p>
+                </div>
+                <button id="btn-close-drawer" style="background: none; border: none; color: #fff; cursor: pointer;">
+                    <i data-lucide="x" style="width: 24px; height: 24px;"></i>
+                </button>
+            </div>
+            <div class="drawer-body">
+                <div class="tag tag-purple" id="drawer-brand-tag" style="margin-bottom: 16px;">Brand</div>
+
+                <!-- Parameters Grid -->
+                <div class="param-grid">
+                    <div class="param-card">
+                        <div class="param-val" id="val-eoq">-</div>
+                        <div class="param-lbl">EOQ</div>
+                    </div>
+                    <div class="param-card">
+                        <div class="param-val" id="val-safety-stock">-</div>
+                        <div class="param-lbl">Safety Stock</div>
+                    </div>
+                    <div class="param-card">
+                        <div class="param-val" id="val-rop">-</div>
+                        <div class="param-lbl">Reorder Point</div>
+                    </div>
+                </div>
+
+                <!-- Sales Statistics -->
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px;">
+                    <span class="text-muted">Avg Daily Demand</span>
+                    <span id="val-daily-demand" style="font-weight: 600;">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 16px;">
+                    <span class="text-muted">Estimated Orders/Year</span>
+                    <span id="val-orders-year" style="font-weight: 600;">-</span>
+                </div>
+
+                <!-- Forecast Chart -->
+                <div class="card" style="padding: 12px; margin-bottom: 0;">
+                    <h4 style="font-size: 0.9rem; margin-bottom: 12px;">Weekly Sales vs Forecast</h4>
+                    <div style="height: 160px; position: relative;">
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Overlay screen for Retraining -->
+        <div class="overlay" id="retrain-overlay">
+            <div class="spinner"></div>
+            <h3 id="overlay-title">Executing Retraining</h3>
+            <p id="overlay-desc">Fitting XGBoost & RandomForest models and updating inventory metrics. This might take 30-45 seconds...</p>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        // API Base URL (Dynamic according to host)
+        const API_BASE = window.location.origin;
+
+        // State variables
+        let products = [];
+        let alerts = [];
+        let activeTab = 'home';
+        let chartInstance = null;
+
+        // DOM elements
+        const panels = {
+            home: document.getElementById('panel-home'),
+            products: document.getElementById('panel-products'),
+            alerts: document.getElementById('panel-alerts'),
+            mlops: document.getElementById('panel-mlops')
+        };
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Setup Tab Navigation
+        document.querySelectorAll('.tab-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+
+                // Switch Panels
+                const target = item.getAttribute('data-target');
+                activeTab = target;
+                
+                Object.keys(panels).forEach(key => {
+                    if (key === target) {
+                        panels[key].classList.add('active');
+                    } else {
+                        panels[key].classList.remove('active');
+                    }
+                });
+
+                // Update Header
+                const titles = {
+                    home: 'SmartInventory',
+                    products: 'Product Inventory',
+                    alerts: 'Reorder Alerts',
+                    mlops: 'MLOps Pipeline'
+                };
+                document.getElementById('header-title').textContent = titles[target];
+            });
+        });
+
+        // Fetch Health check
+        async function fetchHealth() {
+            try {
+                const res = await fetch(`${API_BASE}/health`);
+                const data = await res.json();
+                document.getElementById('val-total-products').textContent = data.products_count;
+            } catch (err) {
+                console.error("Health check failed:", err);
+            }
+        }
+
+        // Fetch products list
+        async function fetchProducts() {
+            try {
+                const res = await fetch(`${API_BASE}/products`);
+                products = await res.json();
+                
+                // Populates filter list
+                const brands = new Set(products.map(p => p.brand_name));
+                const filterContainer = document.getElementById('brand-filters');
+                
+                // Clear extra buttons
+                filterContainer.innerHTML = '<span class="filter-btn active" data-brand="all">All Brands</span>';
+                
+                brands.forEach(b => {
+                    if (b) {
+                        const btn = document.createElement('span');
+                        btn.className = 'filter-btn';
+                        btn.setAttribute('data-brand', b);
+                        btn.textContent = b;
+                        btn.onclick = () => filterProducts(b, btn);
+                        filterContainer.appendChild(btn);
+                    }
+                });
+
+                // Set initial active
+                document.querySelector('[data-brand="all"]').onclick = (e) => filterProducts('all', e.target);
+
+                renderProductList(products);
+            } catch (err) {
+                console.error("Fetch products failed:", err);
+                document.getElementById('product-list').innerHTML = 
+                    `<div style="text-align: center; color: var(--critical);">Failed to load products.</div>`;
+            }
+        }
+
+        // Render product list
+        function renderProductList(list) {
+            const container = document.getElementById('product-list');
+            container.innerHTML = '';
+            
+            if (list.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-muted);">No products found</div>';
+                return;
+            }
+
+            list.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'product-item';
+                item.onclick = () => openProductDrawer(p.item_id);
+
+                item.innerHTML = `
+                    <div class="product-info">
+                        <h4>${p.item_name}</h4>
+                        <p>ID: ${p.item_id} │ ${p.master_brand}</p>
+                    </div>
+                    <div class="product-meta">
+                        <span class="tag tag-purple">${p.brand_name}</span>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Filter products
+        function filterProducts(brand, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const query = document.getElementById('product-search').value.toLowerCase();
+            let filtered = products;
+
+            if (brand !== 'all') {
+                filtered = filtered.filter(p => p.brand_name === brand);
+            }
+
+            if (query) {
+                filtered = filtered.filter(p => 
+                    p.item_name.toLowerCase().includes(query) || 
+                    p.item_id.toLowerCase().includes(query)
+                );
+            }
+
+            renderProductList(filtered);
+        }
+
+        // Search inputs change
+        document.getElementById('product-search').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const activeBrandBtn = document.querySelector('.filter-btn.active');
+            const brand = activeBrandBtn ? activeBrandBtn.getAttribute('data-brand') : 'all';
+
+            let filtered = products;
+            if (brand !== 'all') {
+                filtered = filtered.filter(p => p.brand_name === brand);
+            }
+
+            filtered = filtered.filter(p => 
+                p.item_name.toLowerCase().includes(query) || 
+                p.item_id.toLowerCase().includes(query)
+            );
+            renderProductList(filtered);
+        });
+
+        // Open product drawer detail
+        async function openProductDrawer(itemId) {
+            try {
+                const res = await fetch(`${API_BASE}/products/${itemId}`);
+                const detail = await res.json();
+
+                document.getElementById('drawer-item-name').textContent = detail.item_name;
+                document.getElementById('drawer-item-id').textContent = `ItemID: ${detail.item_id} │ ${detail.master_brand}`;
+                document.getElementById('drawer-brand-tag').textContent = detail.brand_name;
+
+                // Inventory metrics
+                document.getElementById('val-eoq').textContent = detail.inventory.eoq ? Math.round(detail.inventory.eoq) : 'N/A';
+                document.getElementById('val-safety-stock').textContent = Math.round(detail.inventory.safety_stock);
+                document.getElementById('val-rop').textContent = Math.round(detail.inventory.reorder_point);
+                document.getElementById('val-daily-demand').textContent = `${Math.round(detail.inventory.avg_daily_demand)} units/day`;
+                document.getElementById('val-orders-year').textContent = detail.inventory.orders_per_year ? Math.round(detail.inventory.orders_per_year) : 'N/A';
+
+                // Display chart
+                createForecastChart(detail.forecast);
+
+                document.getElementById('product-drawer').classList.add('open');
+            } catch (err) {
+                console.error("Open drawer failed:", err);
+            }
+        }
+
+        // Close product drawer
+        document.getElementById('btn-close-drawer').onclick = () => {
+            document.getElementById('product-drawer').classList.remove('open');
+        };
+
+        // Create Chart.js
+        function createForecastChart(forecast) {
+            const ctx = document.getElementById('forecastChart').getContext('2d');
+            
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            // Create sample baseline data for actual vs forecast display
+            const weeks = ['Week 23', 'Week 24', 'Week 25', 'Week 26'];
+            const actuals = [
+                forecast.actual_mean * 0.9, 
+                forecast.actual_mean * 1.1, 
+                forecast.actual_mean * 0.95, 
+                forecast.actual_mean
+            ];
+            const forecasts = [
+                forecast.forecast_mean * 0.98,
+                forecast.forecast_mean * 1.02,
+                forecast.forecast_mean * 0.97,
+                forecast.forecast_mean
+            ];
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: weeks,
+                    datasets: [
+                        {
+                            label: 'Actual Sales',
+                            data: actuals,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2.5,
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'ML Forecast',
+                            data: forecasts,
+                            borderColor: '#8b5cf6',
+                            borderDash: [5, 5],
+                            backgroundColor: 'transparent',
+                            borderWidth: 2.5,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: '#9ca3af',
+                                font: { size: 9 }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#9ca3af', font: { size: 9 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#9ca3af', font: { size: 9 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Fetch alerts
+        async function fetchAlerts() {
+            try {
+                const res = await fetch(`${API_BASE}/inventory/alerts`);
+                const data = await res.json();
+                
+                alerts = data.alerts;
+                document.getElementById('val-active-alerts').textContent = data.total_alerts;
+
+                const container = document.getElementById('alerts-list');
+                container.innerHTML = '';
+
+                if (alerts.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+                            <i data-lucide="check-circle" style="color: var(--success); width: 32px; height: 32px; margin-bottom: 8px;"></i>
+                            <p>All stock levels are adequate!</p>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                    return;
+                }
+
+                alerts.forEach(a => {
+                    const item = document.createElement('div');
+                    item.className = 'product-item';
+                    item.onclick = () => openProductDrawer(a.item_id);
+                    
+                    const statusTag = a.status === 'critical' 
+                        ? '<span class="tag tag-critical">CRITICAL STOCK</span>' 
+                        : '<span class="tag tag-warning">ROP REACHED</span>';
+
+                    item.innerHTML = `
+                        <div class="product-info">
+                            <h4>${a.item_name}</h4>
+                            <p>Forecast: ${Math.round(a.forecast_mean)} │ ROP: ${Math.round(a.reorder_point)}</p>
+                        </div>
+                        <div class="product-meta">
+                            ${statusTag}
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (err) {
+                console.error("Fetch alerts failed:", err);
+            }
+        }
+
+        // Fetch drift and update MLOps UI
+        async function checkDataDrift() {
+            try {
+                const res = await fetch(`${API_BASE}/mlops/drift-check`);
+                const data = await res.json();
+
+                const container = document.getElementById('drift-details-container');
+                container.innerHTML = '';
+
+                // Summary on home screen
+                const hasDrift = data.retrain_recommended;
+                const summaryText = document.getElementById('drift-summary-text');
+                summaryText.textContent = hasDrift ? '🚨 Drift Detected' : '✅ Stable';
+                summaryText.style.color = hasDrift ? 'var(--critical)' : 'var(--success)';
+
+                // Details tab details
+                data.metrics.forEach(m => {
+                    const block = document.createElement('div');
+                    block.className = 'drift-status-block';
+                    
+                    let statusColor = 'var(--success)';
+                    if (m.status.includes('Moderate')) statusColor = 'var(--warning)';
+                    if (m.status.includes('Severe')) statusColor = 'var(--critical)';
+
+                    block.innerHTML = `
+                        <div>
+                            <strong style="font-size: 0.9rem;">${m.feature}</strong>
+                            <p style="font-size: 0.75rem; color: var(--text-muted);">PSI Score: ${m.psi}</p>
+                        </div>
+                        <span style="font-size: 0.8rem; font-weight: 600; color: ${statusColor};">${m.status}</span>
+                    `;
+                    container.appendChild(block);
+                });
+
+                if (hasDrift) {
+                    const notice = document.createElement('div');
+                    notice.className = 'card';
+                    notice.style.borderColor = 'var(--critical)';
+                    notice.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
+                    notice.style.marginTop = '12px';
+                    notice.innerHTML = `
+                        <p style="font-size: 0.8rem; color: #f87171; font-weight: 500;">
+                            ⚠️ Retraining is highly recommended because of features drift: ${data.reasons.join(', ')}
+                        </p>
+                    `;
+                    container.appendChild(notice);
+                }
+            } catch (err) {
+                console.error("Drift check failed:", err);
+                document.getElementById('drift-details-container').innerHTML = 
+                    `<div style="text-align: center; color: var(--critical);">Could not load drift status.</div>`;
+            }
+        }
+
+        // Trigger Retraining
+        document.getElementById('btn-trigger-retrain').addEventListener('click', async () => {
+            const overlay = document.getElementById('retrain-overlay');
+            overlay.classList.add('active');
+
+            try {
+                const res = await fetch(`${API_BASE}/mlops/retrain`, { method: 'POST' });
+                const result = await res.json();
+                
+                overlay.classList.remove('active');
+
+                if (result.status === 'success') {
+                    // Update metrics block
+                    document.getElementById('retrain-metrics-card').style.display = 'block';
+                    document.getElementById('metric-mae').textContent = Math.round(result.metrics.MAE);
+                    document.getElementById('metric-wmape').textContent = `${result.metrics.WMAPE.toFixed(2)}%`;
+
+                    // Reload everything
+                    await reloadAllData();
+                } else {
+                    alert("Retraining pipeline failed to execute.");
+                }
+            } catch (err) {
+                overlay.classList.remove('active');
+                console.error("Retrain failed:", err);
+                alert("An error occurred during model retraining.");
+            }
+        });
+
+        // Global refresh action
+        async function reloadAllData() {
+            const btn = document.getElementById('btn-refresh');
+            btn.style.transform = 'rotate(360deg)';
+            btn.style.transition = 'transform 0.8s';
+            
+            await Promise.all([
+                fetchHealth(),
+                fetchProducts(),
+                fetchAlerts(),
+                checkDataDrift()
+            ]);
+
+            setTimeout(() => {
+                btn.style.transform = 'rotate(0deg)';
+                btn.style.transition = 'none';
+            }, 800);
+        }
+
+        document.getElementById('btn-refresh').onclick = reloadAllData;
+
+        // On Load initializers
+        window.addEventListener('load', () => {
+            reloadAllData();
+        });
+    </script>
+</body>
+</html>

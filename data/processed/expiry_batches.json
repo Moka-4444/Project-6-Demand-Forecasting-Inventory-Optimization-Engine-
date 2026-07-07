@@ -1,0 +1,26 @@
+[
+  {
+    "item_id": "BCH-3-08-00272",
+    "item_name": "\u0628\u0648\u0634\u0627\u0631\u062a\u064a \u0645\u0644\u062d ",
+    "batch_no": "BCH-2026-04A",
+    "expiry_date": "2026-06-22",
+    "qty": 450.0,
+    "days_remaining": -12
+  },
+  {
+    "item_id": "BCH-3-08-00273",
+    "item_name": "\u0628\u0648\u0634\u0627\u0631\u062a\u064a \u0645\u0644\u062d \u0628\u0627\u0631\u0628\u0643\u064a\u0648",
+    "batch_no": "BCH-2026-05C",
+    "expiry_date": "2026-07-09",
+    "qty": 280.0,
+    "days_remaining": 5
+  },
+  {
+    "item_id": "BCH-3-08-00274",
+    "item_name": "\u0628\u0648\u0634\u0627\u0631\u062a\u064a \u0647\u0648\u062a \u0628\u0627\u0631\u0628\u0643\u064a\u0648",
+    "batch_no": "BCH-2026-06B",
+    "expiry_date": "2026-07-22",
+    "qty": 670.0,
+    "days_remaining": 18
+  }
+]

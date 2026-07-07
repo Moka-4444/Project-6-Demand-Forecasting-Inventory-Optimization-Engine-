@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Square restock loop: two arrows forming a square cycle with rounded corners -->
+  <!-- Top-right arrow segment (going right then down) -->
+  <path
+    d="M 28 20 L 68 20 Q 80 20 80 32 L 80 45"
+    stroke="#FF5722"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+  <!-- Arrowhead pointing down (right side) -->
+  <polyline
+    points="72,38 80,50 88,38"
+    stroke="#FF5722"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+
+  <!-- Bottom-left arrow segment (going left then up) -->
+  <path
+    d="M 72 80 L 32 80 Q 20 80 20 68 L 20 55"
+    stroke="#FF5722"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+  <!-- Arrowhead pointing up (left side) -->
+  <polyline
+    points="28,62 20,50 12,62"
+    stroke="#FF5722"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+</svg>

@@ -1,0 +1,18 @@
+.git
+.gitignore
+*.md
+notebooks/
+!notebooks/weekly.csv
+scripts/
+dashboard/
+docs/
+data/raw/
+stocksense/
+Demand Forecasting Inventory Optimization Refined/
+*.log
+*.tmp
+__pycache__/
+*.pyc
+.env
+venv/
+.venv/

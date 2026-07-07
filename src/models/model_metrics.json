@@ -1,0 +1,5 @@
+{
+  "xgb_wmape": 20.61,
+  "rf_wmape": 20.67,
+  "ensemble_wmape": 36.56
+}
