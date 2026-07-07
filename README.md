@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/app_icon.png" width="130" alt="StockSense Logo"/>
+<img src="stocksense/assets/images/logo.svg" width="130" alt="StockSense Logo"/>
 
 # StockSense
 ### AI-Powered FMCG Demand Forecasting & Inventory Optimization Engine
@@ -57,39 +57,38 @@ The system covers the full lifecycle:
 
 ```mermaid
 graph TB
-    subgraph Mobile["📱 StockSense Mobile App (Flutter)"]
-        A[Login Screen] --> B[Dashboard]
-        B --> C[Inventory Catalog]
-        B --> D[Alerts]
-        B --> E[AI Health Monitor]
-        B --> F[Procurement]
-        B --> G[Scanner]
+    subgraph MobileApp["Mobile App - Flutter"]
+        A["Login"] --> B["Dashboard"]
+        B --> C["Inventory Catalog"]
+        B --> D["Alerts"]
+        B --> E["AI Health Monitor"]
+        B --> F["Procurement"]
     end
 
-    subgraph Backend["⚡ FastAPI Backend (Python 3.11)"]
-        H[/auth/login] --> I[Token Manager]
-        J[/inventory/report] --> K[Model Engine]
-        L[/inventory/simulate] --> K
-        M[/mlops/drift/check] --> N[PSI Detector]
-        O[/mlops/retrain] --> P[Retrain Pipeline]
-        K --> Q[(ML Models\nXGB + RF + Ridge)]
-        K --> R[(Processed Data\nJSON + CSV)]
+    subgraph BackendAPI["FastAPI Backend - Python 3.11"]
+        H["auth/login"] --> I["Token Manager"]
+        J["inventory/report"] --> K["Model Engine"]
+        L["inventory/simulate"] --> K
+        M["mlops/drift/check"] --> N["PSI Detector"]
+        O["mlops/retrain"] --> P["Retrain Pipeline"]
+        K --> Q[("ML Models - XGBoost + RF + Ridge")]
+        K --> R[("Processed Data - JSON + CSV")]
     end
 
-    subgraph Infra["☁️ Azure Infrastructure (UAE North)"]
-        S[Azure Container Registry\nstocksensecr.azurecr.io]
-        T[Azure App Service\nLinux B1]
+    subgraph AzureInfra["Azure Infrastructure - UAE North"]
+        S["Container Registry"]
+        T["App Service - Linux B1"]
         S --> T
     end
 
-    subgraph CICD["🔄 CI/CD Pipeline"]
-        U[GitHub Repository] -->|git push main| V[GitHub Actions]
-        V -->|docker build + push| S
-        V -->|az webapp deploy| T
+    subgraph Pipeline["CI/CD - GitHub Actions"]
+        U["GitHub Repository"] -->|"git push main"| V["GitHub Actions"]
+        V -->|"docker build and push"| S
+        V -->|"webapp deploy"| T
     end
 
-    Mobile -->|HTTPS| Backend
-    Backend --> Infra
+    MobileApp -->|"HTTPS"| BackendAPI
+    BackendAPI --> AzureInfra
 ```
 
 ---
@@ -461,10 +460,10 @@ We extend our deepest gratitude to our incredible instructor for his unwavering 
 
 ---
 
-This project was developed as part of the **Data Engineering & Python Integration (DEPI)** program.
+This project was developed as part of the **AI & Data Science - Microsoft Machine Learning Engineer (DEPI)** program.
 
 <br/>
 
-*Built with ❤️ by the StockSense Team — Egypt University of Informatics*
+*Built with ❤️ by the StockSense Team*
 
 </div>
