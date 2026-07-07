@@ -75,26 +75,27 @@ class _MainNavigationContainerState
 
   void _logout() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Capture the navigator before the dialog opens so we can still
+    // use it after the dialog's BuildContext is dismissed (unmounted).
+    final navigator = Navigator.of(context);
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         backgroundColor: Theme.of(context).cardColor,
         title: Text('Log Out', style: TextStyle(color: isDark ? Colors.white : AppTheme.textMainLight)),
         content: Text('Are you sure you want to log out?', style: TextStyle(color: isDark ? Colors.white70 : AppTheme.textMutedLight)),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogCtx),
             child: Text('Cancel',
                 style: TextStyle(color: isDark ? Colors.white54 : AppTheme.textMutedLight)),
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pop(context);
-              await ApiService.logout();
-              if (!context.mounted) return;
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                    builder: (context) => const LoginScreen()),
+              Navigator.pop(dialogCtx); // dismiss dialog
+              await ApiService.logout();  // clear token from memory + prefs
+              navigator.pushReplacement(
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
               );
             },
             style: ElevatedButton.styleFrom(

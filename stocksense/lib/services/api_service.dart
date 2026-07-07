@@ -37,10 +37,9 @@ class ApiService {
   static Future<void> loadSession() async {
     final prefs = await SharedPreferences.getInstance();
     _authToken = prefs.getString('auth_token');
-    final savedUrl = prefs.getString('api_base_url');
-    if (savedUrl != null && savedUrl.isNotEmpty) {
-      baseUrl = savedUrl;
-    }
+    // NOTE: baseUrl is hardcoded to the live Azure endpoint.
+    // We intentionally do NOT restore api_base_url from prefs here,
+    // as old locally-saved URLs could silently override the live server.
   }
 
   static Future<void> saveSession(String token, {String? url, String? role}) async {
