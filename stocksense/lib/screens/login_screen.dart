@@ -52,9 +52,21 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
     } else {
+      // Show a specific message based on what went wrong
+      final String msg;
+      switch (ApiService.lastLoginError) {
+        case 'timeout':
+          msg = 'Server is warming up — please try again in a few seconds.';
+          break;
+        case 'network':
+          msg = 'Cannot reach the server. Please check your internet connection.';
+          break;
+        default:
+          msg = 'Incorrect email or password. Please try again.';
+      }
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Login failed. Please check your credentials and try again.';
+        _errorMessage = msg;
       });
     }
   }
@@ -234,11 +246,22 @@ class _LoginScreenState extends State<LoginScreen> {
                       elevation: 0,
                     ),
                     child: _isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: Colors.white))
+                        ? Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: Colors.white)),
+                              const SizedBox(height: 6),
+                              Text(
+                                'Connecting...',
+                                style: GoogleFonts.dmSans(
+                                    fontSize: 11, color: Colors.white70),
+                              ),
+                            ],
+                          )
                         : Text(
                             'Sign In',
                             style: GoogleFonts.sora(
@@ -248,6 +271,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                   ),
                 ),
+                if (_isLoading) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    'First connection may take up to 60s\nwhile the server wakes up ☁️',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.dmSans(
+                      fontSize: 11,
+                      color: textMuted,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

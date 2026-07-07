@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
@@ -9,6 +10,9 @@ import '../models/alert_item.dart';
 class ApiService {
   static String baseUrl = _defaultBaseUrl();
   static String? _authToken;
+
+  // Tracks why the last login failed: 'timeout' | 'auth' | 'network' | null
+  static String? lastLoginError;
 
   static final Map<String, double> lastLatencies = {
     '/products': 12.0,
@@ -74,12 +78,13 @@ class ApiService {
 
   // Auth
   static Future<Map<String, dynamic>?> login(String email, String password) async {
+    lastLoginError = null;
     try {
       final res = await http.post(
         Uri.parse('$baseUrl/auth/login'),
         headers: _headers(json: true),
         body: jsonEncode({'email': email, 'password': password}),
-      ).timeout(const Duration(seconds: 8));
+      ).timeout(const Duration(seconds: 60)); // 60s to handle Azure B1 cold starts
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
         await saveSession(
@@ -87,9 +92,13 @@ class ApiService {
           role: data['role'] as String?,
         );
         return data;
+      } else {
+        lastLoginError = 'auth'; // Wrong credentials (401/403)
       }
+    } on TimeoutException {
+      lastLoginError = 'timeout'; // Server cold-starting
     } catch (e) {
-      print('Login error: $e');
+      lastLoginError = 'network'; // No internet / DNS failure
     }
     return null;
   }
@@ -109,7 +118,7 @@ class ApiService {
   // Health check
   static Future<Map<String, dynamic>> checkHealth() async {
     try {
-      final res = await http.get(Uri.parse('$baseUrl/health')).timeout(const Duration(seconds: 4));
+      final res = await http.get(Uri.parse('$baseUrl/health')).timeout(const Duration(seconds: 30)); // 30s for cold start
       if (res.statusCode == 200) {
         return jsonDecode(res.body);
       }
